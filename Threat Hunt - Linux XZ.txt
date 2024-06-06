@@ -1,0 +1,100 @@
+Threat Hunt - Linux XZ utils - CVE-2024-3094
+
+Description of Alert:
+Threat Hunt - Linux XZ utils
+
+Cyber defenders take note there is a supply chain compromise on the popular Linux XZ utils, if you have Linux running on Azure with Microsoft Defender for Cloud (MDC) enabled, run the below interim KQL to check if your Azure Cloud Linux servers are impacted and the latter KQL when Microsoft update their TVM database for this critical CVE
+
+Severity:
+medium
+
+Triage / Investigation Verdict and Incident Tags:
+Threat Hunt
+
+Description
+
+Malicious code was discovered in the upstream tarballs of xz, starting with version 5.6.0. Through a series of complex obfuscations, the liblzma build process extracts a prebuilt object file from a disguised test file existing in the source code, which is then used to modify specific functions in the liblzma code. This results in a modified liblzma library that can be used by any software linked against this library, intercepting and modifying the data interaction with this library.
+
+Additional Info:
+CVE-2024-3094   
+CISA and the open source community are responding to reports of malicious code being embedded in XZ Utils versions 5.6.0 and 5.6.1. This activity was assigned CVE-2024-3094
+
+. XZ Utils is data compression software and may be present in Linux distributions. The malicious code may allow unauthorized access to affected systems. 
+
+CISA recommends developers and users to downgrade XZ Utils to an uncompromised version—such as XZ Utils 5.4.6 Stable—hunt for any malicious activity and report any positive findings to CISA. 
+
+
+CISA Alert:
+https://lnkd.in/gAkiCfBS
+
+Red Hat Alert:
+https://lnkd.in/g2BGRGTy
+--------------------------
+Affected Versions:
+
+Distro 			Affected Version
+
+Red Hat 		Fedora Linux 40 and Fedora Rawhide
+
+Debian 			No Debian stable versions are known to be affected.
+Compromised packages were part of the Debian testing, unstable and experimental distributions, with versions ranging from 5.5.1alpha-0.1 (uploaded on 2024-02-01), up to and including 5.6.1-1.
+
+Kali 	The impact of this vulnerability affected Kali between March 26-29. If you updated your Kali installation on or after March 26, it is crucial to apply the latest updates today to address this issue. However, if you did not update your Kali installation before March 26, you are not affected by this backdoor vulnerability.
+
+OpenSUSE 	OpenSUSE Tumbleweed and OpenSUSE Micro OS between March 7th and March 28th 2024.
+
+Alpine 	5.6 versions prior to 5.6.1-r2 
+
+Arch 	
+Installation medium 2024.03.01
+Virtual machine images 20240301.218094 and 20240315.221711
+Container images created between and including 2024-02-24 and 2024-03-28
+-----------------------------------------
+
+
+-----------------------------------------------------------------------------------
+//For a list of available tables to query you can use the following command:
+ 
+//search "*" | summarize count() by $table | sort by count_ desc
+
+Interim KQL:
+
+DeviceTvmSoftwareInventory 
+
+DeviceInfo
+| where SoftwareName contains "xz"
+| where SoftwareVersion contains "5.6."
+
+KQL to use when Microsoft update their TVM database definitions:
+
+DeviceTvmSoftwareVulnerabilities
+// Defender Portal -> Advanced Hunting tab
+| where CveId == "CVE-2024-3094"
+
+
+Another option for searching multiple Defender tenants at once would be to use https://mto.security.microsoft.com.  The advanced hunting tab here lets you select what tenants you want to include in your search.  
+ 
+Queries:
+ 
+This query will provide a list of all installed versions of XZ in your organization:
+DeviceTvmSoftwareInventory
+| where SoftwareName startswith “liblzma” or SoftwareName startswith “xz”
+| summarize dcount(DeviceId) by SoftwareVendor, SoftwareName, SoftwareVersion
+ 
+This query will provide a list of devices with vulnerable version installed:
+DeviceTvmSoftwareInventory
+| where SoftwareName startswith “liblzma” or SoftwareName startswith “xz”
+| where SoftwareVersion contains “5.6.0” or SoftwareVersion contains “5.6.1”
+
+-------------------------------------------------------
+Each client was scanned separately, and the results are as follows:
+
+CLIENT		          RESULTS
+__________________________________________________________
+		    			    
+--------------------------------------
+The queries identified no vulnerable versions of xz utils present.
+----------------------------------------
+
+
+
