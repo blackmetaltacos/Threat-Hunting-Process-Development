@@ -1,0 +1,42 @@
+Threat Hunt - IP Addresses Logged by the Rosethorn PotNet-AlienVault
+
+Description:
+A weekly threat hunt for Indicators of Compromise (IOCs) is conducted using AlienVault as the source. Every week, around 25 to 30 new IP addresses are added to the list. A Kusto Query Language (KQL) query is executed in each client environment, and a separate alert is created in ServiceNow and investigated. 
+
+IP Addresses Logged by the Rosethorn PotNet
+CREATED __ MONTHS AGO MODIFIED (DATE) by WhiteFireOCNPublic 
+Malicious activity detections from a small network of honeypots that spans multiple ISPs and geographic locations. Behavior is logged on ports 21, 22, 23, 80, 161, 3306, and 5900.
+
+A query was executed, and the IP addresses obtained are the most recent Indicators of Compromise (IOCs) collected by the AlienVault Pulse mentioned earlier.
+-----------------------------------------------------------------------------------
+//For a list of available tables to query you can use the following command:
+ 
+//search "*" | summarize count() by $table | sort by count_ desc
+
+Enter the IPs taken from AlienVault into query and run query.
+
+CommonSecurityLog //Time frame 7 days
+| where SourceIP in ("")
+
+or
+
+SigninLogs //Time frame 7 days
+| where IPAddress in ("")		
+
+-------------------------------------------------------
+While some of the IP addresses have not been reported for abuse, many originate from countries that some clients have designated as ‘blocked’ according to their conditional access policies.  Each client was scanned separately, and the results are as follows:
+
+CLIENT		    Table Used			SIR	         RESULTS
+
+__________________________________________________________
+
+Closing Notes:
+
+Malicious IPs detected. Firewalls dropped traffic from malicious IPs (was policy-denied, aged-out, or reset.)
+or
+None of the IOCs were detected.
+
+--------------------------------------------------------------
+IOCs
+
+
