@@ -1,0 +1,271 @@
+Threat Actors Leveraging Fake Browser Updates In Malware Campaigns - IOC Threat Hunt 
+
+WORKING NOTES
+____________________________
+
+Description of Threat Hunt:
+Fake browser updates use JavaScript and HTML to control traffic and deliver malware onto the victim’s system. This technique allows the CTA to take advantage of end user cybersecurity awareness training that instills trust in known websites to infect the victim’s system. In security training, end users often receive instructions to trust only websites they know and use as well as click only on links or accept updates from trusted sources.
+
+The most prominent malware during the reporting period were SocGholish and RogueRaticate, with ClearFake comprising only one percent of this malicious activity.
+
+    SocGholish is a downloader written in JavaScript which is distributed through malicious or compromised websites. SocGholish uses fake software updates, specifically browser updates, to trick users into downloading the malware. The malware uses multiple methods for traffic redirection and payload delivery. After initial infection, the CTAs use Cobalt Strike, leverage PowerShell, and steal information from the victim’s system. Additionally, SocGholish infections can lead to further exploitation, such as by the NetSupport remote access tool, AsyncRAT, and ransomware in some cases.
+
+    RogueRaticate has many similarities to the SocGholish campaign. The malware is a downloader written in JavaScript that is distributed in the same manner as SocGholish. The RogueRaticate payload is an HTML application file that is zipped or downloaded as a shortcut file. RogueRaticate, like SocGholish, uses PowerShell leading to additional exploitation, specifically by the NetSupport remote access tool.
+
+    ClearFake is a newer malware discovered in August 2023 that injects base64-encoded scripts to HTML of compromised websites. ClearFake also uses PowerShell and loads additional malware such as Lumma Stealer, Redline, and Racoon v2.
+
+================================================================
+A KQL querey was ran targeting specific indicators of compromise (IoCs). The IoCs were collected from various threat intelligence feeds and historical data.
+
+Queries used:
+SigninLogs //Time frame 7 days
+| where IPAddress in ("")
+| join kind=inner (DeviceFileEvents | where SHA256 == ("")) on DeviceName
+| project DeviceName, DeviceId, SourceIP, SHA256
+
+combined these two queries
+
+SigninLogs //Time frame 7 days
+| where IPAddress in ("")
+
+and
+
+DeviceFileEvents |where SHA256 ==("")
+===========================================
+IOCs
+Malware Name
+	
+SocGholish
+aka FAKEUPDATES
+
+FAKEUPDATES is a downloader written in JavaScript that communicates via HTTP. Supported payload types include executables and JavaScript. It writes the payloads to disk prior to launching them. FAKEUPDATES has led to further compromise via additional malware families that include CHTHONIC, DRIDEX, EMPIRE, KOADIC, DOPPELPAYMER, and AZORULT.
+
+FAKEUPDATES has been heavily used by UNC1543, a financially motivated group.
+
+SHA256 Hashes
+8bdc4c1cd197808056e50b8b958acd380bf8a69b63aedef3f9854173c6714b32
+3fb9740940d44eef823b7ff17f0274a12345a6f238cf46a1133a9e39c7b97c62
+Update.js
+-----------------------------
+RogueRaticate
+
+RogueRaticate has many similarities to the SocGholish campaign. The malware is a downloader written in JavaScript that is distributed in the same manner as SocGholish. The RogueRaticate payload is an HTML application file that is zipped or downloaded as a shortcut file. RogueRaticate, like SocGholish, uses PowerShell leading to additional exploitation, specifically by the NetSupport remote access tool.
+
+SHA256 Hashes
+1d9900c8dbaa47d2587d08b334d483b06a39acb27f83223efc083759f1a7a4f6
+Client-Upd(download).hta
+
+08d9df800127f9fb7ff1a246346e1cf5cfef9a2521d40d6b2ab4e3614a19b772
+Client-Upd(download).hta
+chalenge.dll
+client_updater.exe
+-------------------------------
+ClearFake
+
+ClearFake is a malicious JavaScript framework deployed on compromised websites to deliver further malware using the drive-by download technique. The malware leverages social engineering to trick the user into running a fake web browser update.
+
+There is no Yara-Signature yet. 
+
+SHA256 Hashes
+37bba90d20e429ce3fd56847e4e7aaf83c62fdd70a7dbdcd35b6f2569d47d533
+37bb.exe
+ChrоmеSеtuр.exe.dis
+Chr?m?S?tu?.exe
+MlсrоsоftЕdgеSеtup.exe
+
+ab282db6f1fc4b58272cef47522be19d453126b69f0e421da24487f54d611b2f
+ChromeSetup.msix
+
+IP Addresses
+109.248.206.49
+ISP 		Egor Timoshenko
+Usage Type 	Data Center/Web Hosting/Transit
+Hostname(s) 	109.248.206.49.yadc.ru
+Domain Name 	yacolo.com
+Country 	Russian Federation
+City 		Kemerovo, Kemerovskaya oblast' 
+
+109.248.206.83
+ISP 		Egor Timoshenko
+Usage Type 	Data Center/Web Hosting/Transit
+Hostname(s) 	109.248.206.83.yadc.ru
+Domain Name 	yacolo.com
+Country 	Russian Federation
+City 		Kemerovo, Kemerovskaya oblast' 
+
+109.248.206.101
+ISP 		Egor Timoshenko
+Usage Type 	Data Center/Web Hosting/Transit
+Hostname(s) 	109.248.206.101.yadc.ru
+Domain Name 	yacolo.com
+Country 	Russian Federation
+City 		Kemerovo, Kemerovskaya oblast' 
+
+109.248.206.118
+ISP 		Egor Timoshenko
+Usage Type 	Data Center/Web Hosting/Transit
+Hostname(s) 	109.248.206.118.yadc.ru
+Domain Name 	yacolo.com
+Country 	Russian Federation
+City 		Kemerovo, Kemerovskaya oblast' 
+
+109.248.206.196
+ISP 		Egor Timoshenko
+Usage Type 	Data Center/Web Hosting/Transit
+Hostname(s) 	109.248.206.196.yadc.ru
+Domain Name 	yacolo.com
+Country 	Russian Federation
+City 		Kemerovo, Kemerovskaya oblast' 
+
+135.181.211.230
+ISP 		Hetzner Online GmbH
+Usage Type 	Data Center/Web Hosting/Transit
+Hostname(s) 	head.brawaa.com
+Domain Name 	hetzner.de
+Country 	Finland
+City 		Helsinki, Uusimaa 
+
+-------------------------------------
+NetSupport
+aka NetSupportManager RAT
+
+Enigma Software notes that NetSupport Manager is a genuine application, which was first released about twenty years ago. The purpose of the NetSupport Manager tool is to enable users to receive remote technical support or provide remote computer assistance. However, cyber crooks have hijacked this useful application and misappropriated it to use it in their harmful campaigns. The name of the modified version of the NetSupport Manager has been labeled the NetSupport Manager RAT.
+
+How it's done:
+The attacker mass distributes the malware via email and uses legitimate services to bypass email protection systems while targeting the Technology sector companies.
+
+SHA256 Hashes
+c5c974b3315602ffaab9066aeaac3a55510db469b483cb85f6c591e948d16cfe
+NEAS.c5c974b3315602ffaab9066aeaac3a55510db469b483cb85f6c591e948d16cfezip.zip
+
+8c9cd7a1ac6d4cbc641b31a3c55fde5e0e5a48c9bdaf71a59a2c4c9fd98ff9e7
+8c9cd7a1ac6d4cbc641b31a3c55fde5e0e5a48c9bdaf71a59a2c4c9fd98ff9e7.zip
+
+213af995d4142854b81af3cf73dee7ffe9d8ad6e84fda6386029101dbf3df897
+client32.exe
+
+89f0c8f170fe9ea28b1056517160e92e2d7d4e8aa81f4ed696932230413a6ce1
+client32.exe
+
+28208baa507b260c2df6637427de82ad0423c20e2bceceb92ba5d76074dcd347
+Client32.ini
+
+3c072532bf7674d0c5154d4d22a9d9c0173530c0d00f69911cdbc2552175d899
+htctl32.dll
+
+f4e2f28169e0c88b2551b6f1d63f8ba513feb15beacc43a82f626b93d673f56d
+NSM.LIC
+
+000f7d5189396b90d242461e9b9759e972d06a90277b906587a7096a7ad0c355
+SysNucleus WebHarvy 710215 Webmaster SCloudWS.exe
+
+38684adb2183bf320eb308a96cdbde8d1d56740166c3e2596161f42a40fa32d5 
+pcicl32.dll
+    
+fedd609a16c717db9bea3072bed41e79b564c4bc97f959208bfa52fb3c9fa814
+remcmdstub.exe
+
+b6b51f4273420c24ea7dc13ef4cc7615262ccbdf6f5e5a49dae604ec153055ad
+client32.exe
+
+176aa94a3c6a58d937b1678a15c120b02a9df06770886fd73c4d42d1b38371e3
+pop.zip
+
+URLs
+hxxps://magydostravel[.]com/cdn/zwmrqqgqnaww[.]php
+
+Domains
+Sdjfnvnbbz[.]pw
+arauas[.]com
+
+IP Addresses
+91.219.150.64
+ISP 		LLC Smart Ape
+Usage Type 	Data Center/Web Hosting/Transit
+Hostname(s) 	s816054.srvape.com
+Domain Name 	smartape.ru
+Country 	Russian Federation
+City 		Moscow, Moskva 
+-----------------------------------
+AsyncRAT
+
+AsyncRAT is a Remote Access Tool (RAT) designed to remotely monitor and control other computers through a secure encrypted connection. It is an open source remote administration tool, however, it could also be used maliciously because it provides functionality such as keylogger, remote desktop control, and many other functions that may cause harm to the victim’s computer. 
+
+In addition, AsyncRAT can be delivered via various methods such as spear-phishing, malvertising, exploit kit and other techniques.
+
+SHA256 Hashes
+83c96c9853245a32042e45995ffa41393eeb9891e80ebcfb09de8fae8b5055a3
+1a6631ec900074e051feff18946467d4a57f0427.rl
+
+0159bd243221ef7c5f392bb43643a5f73660c03dc2f74e8ba50e4aaed6c6f531
+payload_1.ps1
+
+f123c1df7d17d51115950734309644e05f3a74a5565c822f17c1ca22d62c3d99
+payload_1.ps1
+
+19402c43b620b96c53b03b5bcfeaa0e645f0eff0bc6e9d1c78747fafbbaf1807
+xral.ps1
+
+34cb840b44befdd236610f103ec1d0f914528f1f256d9ab375ad43ee2887d8ce
+xral.vbs
+
+1c3d5dea254506c5f7c714c0b05f6e2241a25373225a6a77929e4607eb934d08
+1.bat
+
+83b29151a192f868362c0ecffe5c5fabe280c8baac335c79e8950fdd439e69ac
+hrlm.ps1
+
+URLs
+hxxp://45.12.253[.]107:222/f[.]txt
+hxxp://45.12.253[.]107:222/j[.]jpg
+------------------------------------
+Lumma Stealer
+aka LummaC2 Stealer
+
+Lumma Stealer (aka LummaC2 Stealer) is an information stealer written in C language that has been available through a Malware-as-a-Service (MaaS) model on Russian-speaking forums since at least August 2022. It is believed to have been developed by the threat actor "Shamel", who goes by the alias "Lumma". Lumma Stealer primarily targets cryptocurrency wallets and two-factor authentication (2FA) browser extensions, before ultimately stealing sensitive information from the victim's machine. Once the targeted data is obtained, it is exfiltrated to a C2 server via HTTP POST requests using the user agent "TeslaBrowser/5.5"." The stealer also features a non-resident loader that is capable of delivering additional payloads via EXE, DLL, and PowerShell.
+
+Transmitted via craked/pirated software, suspicious emails, sketchy programs found on-line.
+
+SHA256 Hashes
+8bdc4c1cd197808056e50b8b958acd380bf8a69b63aedef3f9854173c6714b32
+Update.js
+
+3fb9740940d44eef823b7ff17f0274a12345a6f238cf46a1133a9e39c7b97c62
+Update.js
+
+Domains
+chouside[.]pw
+taretool[.]pw
+==================================================
+Recommended Actions/Next Steps:  
+
+The following actions to improve network defenses and guard against malware disguised as fake browser updates.
+
+    Provide employee training to protect against social engineering techniques and to encourage employees to report any suspicious activity to the security team.
+
+    Perform regular antivirus scans of systems and ensure those applications remain up to date.
+
+    Consider the use of an add-on ad blocker to block fake browser updates.
+
+    Use Application Allowlists. Application allowlists.
+
+    Implement/Enforce the Principle of Least Privilege.
+
+    Implement/Enforce PowerShell Signed Scripts.
+
+    Ensure adequate logging is in place.
+=========================================================
+Resolution:
+No further actions are required for containment. 
+
+Closing Notes:
+
+CUSTOMER	   
+No IOCs were detected.
+
+====================================================
+More findings/notes
+__________________________ 
+
+
+
